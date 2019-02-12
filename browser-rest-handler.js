@@ -9,9 +9,9 @@ var server = restify.createServer({
   name: 'command-handler',
   version: '1.0.0'
 });
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.queryParser());
-server.use(restify.bodyParser({ mapParams: true }));
+server.use(restify.plugins.acceptParser(server.acceptable));
+server.use(restify.plugins.queryParser());
+server.use(restify.plugins.bodyParser({ mapParams: true }));
 
 server.get('/status', function (req, res, next) {
 	res.setHeader('Access-Control-Allow-Origin', '*');
@@ -115,7 +115,7 @@ function runPeerflix(data){
 	
 	var child = spawn("node", [ "node_modules/peerflix/app.js", data.path, "-f", config.downloadPath, "-c", "100", "-p", "8888", "--on-listening", config.pushScript, "--on-downloaded", config.saveScript]);
 	child.stdout.on('data', function(data) {
-	    //console.log('stdout: ' + data);
+	    console.log('stdout: ' + data);
 	});
 	child.stderr.on('data', function(data) {
 	    console.log('stdout: ' + data);

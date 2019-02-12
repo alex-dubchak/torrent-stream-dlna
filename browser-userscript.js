@@ -9,6 +9,7 @@
 // @include      https://thepiratebay.*/*
 // @include      https://www.fano.in/browse_old.php*
 // @include      https://www.fano.in/details.php*
+// @include      https://toloka.to/*
 // @grant        none
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // ==/UserScript==
@@ -24,7 +25,7 @@ function Uint8ToBase64(u8Arr){
   var result = '';
   var slice;
   while (index < length) {
-    slice = u8Arr.subarray(index, Math.min(index + CHUNK_SIZE, length)); 
+    slice = u8Arr.subarray(index, Math.min(index + CHUNK_SIZE, length));
     result += String.fromCharCode.apply(null, slice);
     index += CHUNK_SIZE;
   }
@@ -36,7 +37,7 @@ function Uint8ToBase64(u8Arr){
  * jquery.binarytransport.js
  *
  * @description. jQuery ajax transport for making binary data type requests.
- * @version 1.0 
+ * @version 1.0
  * @author Henry Algus <henryalgus@gmail.com>
  *
  */
@@ -59,7 +60,7 @@ $.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
 		data = options.data || null,
 		username = options.username || null,
 		password = options.password || null;
-					
+
                 xhr.addEventListener('load', function(){
 			var data = {};
 			data[options.dataType] = xhr.response;
@@ -68,12 +69,12 @@ $.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
                 });
 
                 xhr.open(type, url, async, username, password);
-				
+
 		// setup custom headers
 		for (var i in headers ) {
 			xhr.setRequestHeader(i, headers[i] );
 		}
-				
+
                 xhr.responseType = dataType;
                 xhr.send(data);
             },
@@ -94,7 +95,7 @@ function playTorrent(){
     //console.log($(this).parent("span").next("a").next("a").children("b").html());
     var name = $(this).attr("data-name");
     var value = $(this).attr('href');
-    
+
     var r = confirm("Do you really want to play \""+name+"\"?");
     if (r == true) {
     } else {
@@ -102,8 +103,8 @@ function playTorrent(){
     }
 
     console.log("Loading torrent with link "+value);
-    
-    
+
+
     if (value.toLowerCase().indexOf("magnet:?xt=") >= 0){
         $("#torrentPlayerPreloader").html("Passing magnet to streamer...").fadeIn("slow");
         $.ajax({
@@ -118,7 +119,7 @@ function playTorrent(){
         });
         return;
     }
-    
+
     $("#torrentPlayerPreloader").html(playerLoading).fadeIn("slow");
 
     $.ajax({
@@ -128,11 +129,11 @@ function playTorrent(){
         responseType:'arraybuffer',
         processData: false,
         success: function(data){
-            
+
             $("#torrentPlayerPreloader").html("Torrent loaded, passing data to streamer.");
-            
+
             var base64String = binaryToBase64(data);//btoa(String.fromCharCode.apply(null, new Uint8Array(data)));
-            
+
             //console.log(base64String);
             $.ajax({
                 type: "POST",
@@ -146,7 +147,7 @@ function playTorrent(){
             });
         }
     });
-    
+
     return false;
 }
 
@@ -164,13 +165,13 @@ function checkStatus(){
     }).fail(function() {
          $("#torrentStatus").html("Not running");
     });;
-    
-    
+
+
 }
 
 function runCheck(){
     checkStatus();
-    setTimeout(function(){ runCheck(); }, 3000);   
+    setTimeout(function(){ runCheck(); }, 3000);
 }
 
 function stopTorrent(){
@@ -196,17 +197,17 @@ function stopTorrent(){
 }
 
 function relaunchTorrent(){
-    
+
     var button=$(this);
     button.css("opacity", 0.5);
-    
+
     var r = confirm("Do you really want to relaunch?");
     if (r == true) {
     } else {
         button.css("opacity", 1);
         return false;
     }
-    
+
     $.ajax({
         url: restServerLocation+"/relaunch",
         type: "GET",
@@ -222,54 +223,55 @@ function relaunchTorrent(){
 
 $(document).ready(function(){
 
-    $("body").after('<div style="z-index:100000;font-size: 12px; width: 400px; position: fixed;  bottom: 0px;  left: 0px;  background: rgba(170, 42, 122, 0.71);  padding: 7px;  color: white;  font-family: sans-serif;"><div id="torrentStatus" style="float: left">Manually load unsafe content!</div><div id="torrentStop" style="cursor:pointer;cursor: pointer; float: right;  font-size: 20px;  position: relative;top: -7px;">📴</div><div style="cursor:pointer; float: right;  font-size: 20px;  position: relative;top: -7px;" id="torrentRelaunch">🔄</div></div>');    
+    $("body").after('<div style="z-index:100000;font-size: 12px; width: 400px; position: fixed;  bottom: 0px;  left: 0px;  background: rgba(170, 42, 122, 0.71);  padding: 7px;  color: white;  font-family: sans-serif;"><div id="torrentStatus" style="float: left">Manually load unsafe content!</div><div id="torrentStop" style="cursor:pointer;cursor: pointer; float: right;  font-size: 20px;  position: relative;top: -7px;">📴</div><div style="cursor:pointer; float: right;  font-size: 20px;  position: relative;top: -7px;" id="torrentRelaunch">🔄</div></div>');
 
     runCheck();
 
-    $("body").after('<div id="torrentPlayerPreloader" style="z-index: 100000;display: none;  width: 300px;  height: 18px;  position: fixed;  bottom: 5px;  left: 50%;  background: rgba(170, 42, 122, 0.71);  margin-left: -175px;  border: 2px solid rgb(72, 0, 0);  border-radius: 5px;  padding: 25px;  color: white;  font-family: sans-serif;">'+playerLoading+'</div>');    
+    $("body").after('<div id="torrentPlayerPreloader" style="z-index: 100000;display: none;  width: 300px;  height: 18px;  position: fixed;  bottom: 5px;  left: 50%;  background: rgba(170, 42, 122, 0.71);  margin-left: -175px;  border: 2px solid rgb(72, 0, 0);  border-radius: 5px;  padding: 25px;  color: white;  font-family: sans-serif;">'+playerLoading+'</div>');
 
-    
+
     // Add links to inperil.net
     if (location.hostname.toLowerCase().indexOf("inperil.net") != -1){
-        
+
         $('a').each(function() {
             var value = $(this).attr('href');
             if (value!=undefined && value.toLowerCase().indexOf("download.php") >= 0 && value.toLowerCase().indexOf(".torrent") >= 0){
                 console.log("Found link to torrent: "+value);
                 var name=$(this).next("a").children("b").html();
                 $(this).before('<span title="Play torrent!" style="font-size: 2em"><a style="text-decoration: none" onclick="return false" class="loadTorrent" data-name="'+name+'" href="'+value+'">📺</a></span>');
-            } 
+            }
         });
-        
+
     }
-    
-    // Add links to fano.in
-    if (location.hostname.toLowerCase().indexOf("fano.in") != -1){
-        
+
+    // Add links to toloka.to
+    if (location.hostname.toLowerCase().indexOf("toloka.to") != -1){
+
         $('a').each(function() {
             var value = $(this).attr('href');
-            if (value!=undefined && value.toLowerCase().indexOf("download.php") >= 0 && value.toLowerCase().indexOf(".torrent") >= 0){
-                console.log("Found link to torrent: "+value);
-                var name=value.substr(value.indexOf("name=")+5, value.indexOf(".torrent"));
+            if (value!=undefined && value.toLowerCase().indexOf("download.php") >= 0){
+                
+                var name= $(this).closest("tbody").find(".row6_to").text().trim().slice(0,-8);
+                console.log("Found link to torrent1: ", value, name);
                 $(this).before('<span title="Play torrent!" style="font-size: 2em"><a style="text-decoration: none" onclick="return false" class="loadTorrent" data-name="'+name+'" href="'+value+'">📺</a></span>');
-            } 
+            }
         });
-        
+
     }
 
     // Add links to thepiratebay
     if (location.hostname.toLowerCase().indexOf("thepiratebay.") != -1){
-        
+
         $('a').each(function() {
             var value = $(this).attr('href');
             if (value!=undefined && value.toLowerCase().indexOf("magnet:?xt=") >= 0){
                 console.log("Found link to torrent: "+value);
                 var name=$(this).parent().children(".detName").children("a").html();
                 $(this).before('<span title="Play torrent!" style="font-size: 2em"><a style="text-decoration: none" onclick="return false" class="loadTorrent" data-name="'+name+'" href="'+value+'">📺</a></span>');
-            } 
+            }
         });
     }
-    
+
     $(".loadTorrent").click(playTorrent);
     $("#torrentStop").click(stopTorrent);
     $("#torrentRelaunch").click(relaunchTorrent);
